@@ -1,12 +1,16 @@
-import com.Wea.*;
+import com.Wea.Weather;
+import com.Wea.WeatherRecommendation;
+import com.Wea.WeatherService;
+import com.Wea.WeatherServiceStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Scanner;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 public class WeaTests {
     WeatherServiceStub weatherServiceStub;
@@ -20,12 +24,15 @@ public class WeaTests {
 
     @Test
     public void testGenerateRecommendationWithColdAndNoRain() {
-        // SETUP
-        weatherServiceStub.setTemperature(10.0);  // Cold
-        weatherServiceStub.setPrecipitation(0.0);  // No rain
+        // SETUP USING MOCKITO
+        WeatherService weatherServiceMock = Mockito.mock(WeatherService.class);
 
         // SETUP
-        WeatherRecommendation recommendation = new WeatherRecommendation(weatherServiceStub);
+        when(weatherServiceMock.getTemperature()).thenReturn(10.0);  // Cold
+        when(weatherServiceMock.getPrecipitation()).thenReturn(0.0);  // No rain
+
+        // SETUP
+        WeatherRecommendation recommendation = new WeatherRecommendation(weatherServiceMock);
 
         // EXERCISE
         String result = recommendation.generateRecommendation();
@@ -33,15 +40,17 @@ public class WeaTests {
         // VERIFY
         assertEquals("It is cold so you should wear warm clothing. It is not raining so you don't need an umbrella.", result);
     }
-
     @Test
     public void testGenerateRecommendationWithWarmAndRain() {
-        // SETUP
-        weatherServiceStub.setTemperature(16.0);  // Warm
-        weatherServiceStub.setPrecipitation(1.0);  // Rain
+        // SETUP USING MOCKITO
+        WeatherService weatherServiceMock = Mockito.mock(WeatherService.class);
 
         // SETUP
-        WeatherRecommendation recommendation = new WeatherRecommendation(weatherServiceStub);
+        when(weatherServiceMock.getTemperature()).thenReturn(16.0);  // Warm
+        when(weatherServiceMock.getPrecipitation()).thenReturn(1.0);  // Rain
+
+        // SETUP
+        WeatherRecommendation recommendation = new WeatherRecommendation(weatherServiceMock);
 
         // EXERCISE
         String result = recommendation.generateRecommendation();
@@ -50,8 +59,7 @@ public class WeaTests {
         assertEquals("It is warm so you should wear light clothing. It is currently raining so you do need an umbrella.", result);
     }
 
-
-    @Test
+@Test
     public void testFetchWeatherWithInvalidData() {
         // SETUP
         String code = "abc"; // invalid airport code
@@ -64,14 +72,14 @@ public class WeaTests {
         String weatherData = String.valueOf(recommendation.fetchWeatherData(code, inputDate));
 
         // VERIFY
-        assertEquals("null",weatherData);
+        assertEquals("null", weatherData);
     }
 
     @Test
     public void testRecommendClothingForFutureLocation_ValidDate() {
         // SETUP
         String code = "mla"; // valid airport code
-        String inputDate = "2023-11-08"; // valid date
+        String inputDate = "2023-11-23"; // valid date
         // SETUP
         WeatherRecommendation recommendation = new WeatherRecommendation(weatherServiceStub);
         // EXERCISE
@@ -84,7 +92,7 @@ public class WeaTests {
     public void testRecommendClothingForFutureLocation_InvalidDate() {
         // SETUP
         String code = "mla"; // invalid airport code
-        String inputDate = "2023-11-15"; // invalid date
+        String inputDate = "2023-12-01"; // invalid date
 
         // EXERCISE
         String result = recommendation.recommendClothingForFutureLocation(code, inputDate);
@@ -140,6 +148,7 @@ public class WeaTests {
         System.setIn(originalIn);
 
     }
+
     @Test
     public void testProcessUserChoice_Choice3() {
         // SETUP
@@ -164,4 +173,26 @@ public class WeaTests {
         assertEquals("Invalid choice. Stopping", result);
     }
 
+
+    @Test
+    public void testGenerateRecommendationWorking() {
+        // Create a mock WeatherService
+        WeatherService weatherServiceMock = Mockito.mock(WeatherService.class);
+
+        // Set up the behavior of the mock
+        when(weatherServiceMock.getTemperature()).thenReturn(10.0);
+        when(weatherServiceMock.getPrecipitation()).thenReturn(5.0);
+
+        // Create a WeatherRecommendation instance with the mock WeatherService
+        WeatherRecommendation recommendation = new WeatherRecommendation(weatherServiceMock);
+
+        // Test the generateRecommendation method
+        String result = recommendation.generateRecommendation();
+
+        // Verify the result
+        assertEquals("It is cold so you should wear warm clothing. It is currently raining so you do need an umbrella.", result);
+    }
 }
+
+
+
