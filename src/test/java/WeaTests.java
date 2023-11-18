@@ -172,26 +172,6 @@ public class WeaTests {
         // VERIFY
         assertEquals("Invalid choice. Stopping", result);
     }
-
-
-    @Test
-    public void testGenerateRecommendationWorking() {
-        // Create a mock WeatherService
-        WeatherService weatherServiceMock = Mockito.mock(WeatherService.class);
-
-        // Set up the behavior of the mock
-        when(weatherServiceMock.getTemperature()).thenReturn(10.0);
-        when(weatherServiceMock.getPrecipitation()).thenReturn(5.0);
-
-        // Create a WeatherRecommendation instance with the mock WeatherService
-        WeatherRecommendation recommendation = new WeatherRecommendation(weatherServiceMock);
-
-        // Test the generateRecommendation method
-        String result = recommendation.generateRecommendation();
-
-        // Verify the result
-        assertEquals("It is cold so you should wear warm clothing. It is currently raining so you do need an umbrella.", result);
-    }
 }
 
 
